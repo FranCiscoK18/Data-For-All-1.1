@@ -1,0 +1,84 @@
+# ========================================
+#   NEXT.JS + REACT GITIGNORE PROFESIONAL
+# ========================================
+
+# Dependencias
+node_modules/
+.pnp/
+.pnpm-store/
+.pnp.js
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+
+# Caches
+.next/cache/
+.cache/
+.esbuild/
+parcel-cache/
+
+# Ambientes (importante)
+.env
+.env.*
+!.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editor / IDE configs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Storybook
+storybook-static/
+.out/
+
+# Testing / Coverage
+coverage/
+.nyc_output/
+
+# TypeScript
+*.tsbuildinfo
+
+# Imágenes y archivos temporales
+*.tmp
+*.temp
+*.bak
+
+# Archivos de lock opcionales (usa solo uno)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Archivos comprimidos grandes
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# Archivos de mapa generados por build
+*.map
+
+# Vercel
+.vercel
+.vercel_build_output/
+
+# Others
+local/
+.cache-loader/

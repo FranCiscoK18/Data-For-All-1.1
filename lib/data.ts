@@ -1,0 +1,197 @@
+// Mock data for the complete platform
+export const recommendedPlatforms = {
+  corruption: {
+    federal: {
+      name: "SIDEC - Sistema Integral de Denuncias en Línea",
+      url: "https://sidec.gob.mx",
+      minRequirements: ["Descripción breve", "Tipo de corrupción", "Entidad involucrada"],
+      avgTime: "30 días",
+    },
+    state: {
+      name: "Fiscalía Anticorrupción Q. Roo",
+      url: "https://qroo.gob.mx/denuncias",
+      minRequirements: ["Hechos relevantes", "Lugar y fecha", "Entidad estatal"],
+      avgTime: "20 días",
+    },
+    municipal: {
+      name: "Portal Municipal de Denuncias",
+      url: "https://municipal.gob.mx",
+      minRequirements: ["Descripción del hecho", "Lugar", "Contacto"],
+      avgTime: "15 días",
+    },
+  },
+  poorService: {
+    federal: {
+      name: "PQRD Federal",
+      url: "https://pqrd.gob.mx",
+      minRequirements: ["Descripción de la queja", "Institución", "Servicio recibido"],
+      avgTime: "10 días",
+    },
+    state: {
+      name: "PQRD Quintana Roo",
+      url: "https://qroo.gob.mx/pqrd",
+      minRequirements: ["Detalles de la queja", "Dependencia", "Fecha del hecho"],
+      avgTime: "8 días",
+    },
+    municipal: {
+      name: "Quejas Municipales",
+      url: "https://municipal.gob.mx/quejas",
+      minRequirements: ["Descripción", "Área responsable"],
+      avgTime: "5 días",
+    },
+  },
+  information: {
+    federal: {
+      name: "IFAI - Solicitudes de Información",
+      url: "https://ifai.gob.mx",
+      minRequirements: ["Descripción clara", "Dependencia", "Temática"],
+      avgTime: "20 días hábiles",
+    },
+    state: {
+      name: "IFAIP Quintana Roo",
+      url: "https://ifaipqroo.gob.mx",
+      minRequirements: ["Especificar información", "Formato deseado"],
+      avgTime: "15 días hábiles",
+    },
+    municipal: {
+      name: "Información Pública Municipal",
+      url: "https://municipal.gob.mx/informacion",
+      minRequirements: ["Detalle de solicitud", "Datos personales"],
+      avgTime: "10 días hábiles",
+    },
+  },
+}
+
+export const steps = [
+  {
+    number: 1,
+    title: "¿Qué es una denuncia?",
+    description: "Es un acto por el cual se comunica a las autoridades la comisión de un acto ilícito.",
+    tips: ["Es confidencial", "Puedes ser anónimo", "No requiere prueba perfecta"],
+  },
+  {
+    number: 2,
+    title: "¿Qué diferencia hay entre denuncia, queja y petición?",
+    description: "Denuncia: acto ilícito | Queja: mal servicio público | Petición: acceso a información",
+    tips: ["Elige el tipo correcto", "Cada uno tiene su plataforma", "Los tiempos varían"],
+  },
+  {
+    number: 3,
+    title: "Datos que necesitarás",
+    description: "Información general del caso, sin datos personales de la víctima si prefieres mantener anonimato",
+    tips: ["Sé específico pero breve", "Incluye fechas y lugares", "Anexa documentos si es relevante"],
+  },
+  {
+    number: 4,
+    title: "Tiempos de respuesta",
+    description: "Federal: 20-30 días | Estatal: 10-20 días | Municipal: 5-15 días",
+    tips: ["Guarda tu folio", "Verifica cambios regularmente", "Escala si no hay respuesta"],
+  },
+  {
+    number: 5,
+    title: "Derechos del ciudadano",
+    description: "Acceso a información, trato digno, seguimiento y respuesta justificada",
+    tips: ["Conoce tus derechos", "Documenta todo", "Busca asesoría si lo necesitas"],
+  },
+]
+
+export const mockComplaints = [
+  {
+    id: 1,
+    folio: "PET-2025-001234",
+    type: "corrupción",
+    scope: "federal",
+    institution: "SIDEC",
+    state: "Quintana Roo",
+    municipality: "Cancún",
+    receivedDate: "2025-01-15",
+    lastUpdate: "2025-01-22",
+    status: "En análisis",
+    medium: "En línea",
+    responseTime: 8,
+    estimatedTime: 30,
+    responsible: "Dirección de Investigación",
+  },
+  {
+    id: 2,
+    folio: "PET-2025-005678",
+    type: "mal_servicio",
+    scope: "municipal",
+    institution: "Municipio de Playa del Carmen",
+    state: "Quintana Roo",
+    municipality: "Playa del Carmen",
+    receivedDate: "2025-01-10",
+    lastUpdate: "2025-01-20",
+    status: "Resuelta",
+    medium: "Ventanilla",
+    responseTime: 10,
+    estimatedTime: 15,
+    responsible: "Dirección de Servicios Públicos",
+  },
+  {
+    id: 3,
+    folio: "PET-2025-009012",
+    type: "informacion",
+    scope: "estatal",
+    institution: "IFAIP Quintana Roo",
+    state: "Quintana Roo",
+    municipality: "Chetumal",
+    receivedDate: "2025-01-05",
+    lastUpdate: "2025-01-24",
+    status: "Canalizada",
+    medium: "En línea",
+    responseTime: 19,
+    estimatedTime: 20,
+    responsible: "Dirección de Transparencia",
+  },
+  {
+    id: 4,
+    folio: "PET-2025-003456",
+    type: "corrupción",
+    scope: "estatal",
+    institution: "Fiscalía Anticorrupción",
+    state: "Quintana Roo",
+    municipality: "Cozumel",
+    receivedDate: "2025-01-12",
+    lastUpdate: "2025-01-21",
+    status: "En análisis",
+    medium: "En línea",
+    responseTime: 9,
+    estimatedTime: 20,
+    responsible: "Unidad de Investigación",
+  },
+]
+
+export const publicData = {
+  byType: {
+    Corrupción: 245,
+    "Mal servicio": 189,
+    "Acceso a información": 342,
+    "Abuso de autoridad": 78,
+  },
+  byStatus: {
+    Recibida: 150,
+    "En análisis": 234,
+    Canalizada: 189,
+    Concluida: 281,
+  },
+  byMunicipality: {
+    Cancún: 425,
+    "Playa del Carmen": 312,
+    Chetumal: 245,
+    Cozumel: 128,
+    Otro: 156,
+  },
+  avgResponseTime: {
+    Federal: 28,
+    Estatal: 16,
+    Municipal: 9,
+  },
+  monthlyTrend: [
+    { month: "Sep", cases: 150 },
+    { month: "Oct", cases: 189 },
+    { month: "Nov", cases: 234 },
+    { month: "Dic", cases: 267 },
+    { month: "Ene", cases: 289 },
+  ],
+}
