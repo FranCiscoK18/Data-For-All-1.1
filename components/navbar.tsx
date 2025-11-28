@@ -22,8 +22,8 @@ const navLinks = [
     label: "Datos Abiertos",
   },
   {
-    href: "/programas", // <- nuevo botón negro
-    label: "Programas sociales",
+    href: "/programas", // <- nuevo botón negro 
+    label: "Programas sociales", 
   },
 ];
 

@@ -1,152 +1,302 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import AdminNavbar from "@/components/admin-navbar"
 import AdminSidebar from "@/components/admin-sidebar"
 import Petitions from "@/components/admin/petitions"
 import Metrics from "@/components/admin/metrics"
-import { mockComplaints } from "@/lib/data"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
-export default function AdminPage() {
-  const [activeSection, setActiveSection] = useState("dashboard")
-  const [complaints, setComplaints] = useState(mockComplaints)
-  const [selectedComplaint, setSelectedComplaint] = useState<(typeof mockComplaints)[0] | null>(null)
+type H25ServidorPublico = {
+  id_sp: number
+  denuncia_id: number
+  organismo_alcaldia: string
+  cargo_grado_servidor: string
+  tipo_de_falta: string
+  unidad_investigadora: string
+}
 
-  const updateComplaintStatus = (id: number, newStatus: string) => {
-    setComplaints(
-      complaints.map((c) =>
-        c.id === id ? { ...c, status: newStatus, lastUpdate: new Date().toISOString().split("T")[0] } : c,
-      ),
-    )
+type H25Denunciante = {
+  id_denunc_cal: number
+  denuncia_id: number
+  calidad_denunciante: string
+}
+
+type H25DenunciaBasica = {
+  folio_id: number
+  fecha_emision: string
+  razon_justificacion: string
+  estado_denuncia: string
+}
+
+type H25FaltaClasif = {
+  id_falta: number
+  denuncia_id: number
+  tipo_falta: string
+  area_proyecto_vinculado: string
+}
+
+type H25ProcesoInv = {
+  id_proceso: number
+  denuncia_id: number
+  plazos_legales_dias: number
+  medidas_cautelares: string
+}
+
+type H25Resolucion = {
+  id_resolucion: number
+  denuncia_id: number
+  fecha_resolucion_final: string
+  resultado_fallo: string
+  tipo_sancion_impuesta: string
+  monto_suspension: number
+}
+
+type ApiResponse = {
+  h25_sp?: H25ServidorPublico[]
+  h25_denunc_anon?: H25Denunciante[]
+  h25_denuncias_bas?: H25DenunciaBasica[]
+  h25_falta_clasif?: H25FaltaClasif[]
+  h25_proc_inv?: H25ProcesoInv[]
+  h25_res_sanc?: H25Resolucion[]
+}
+
+type DenunciaEnriquecida = {
+  id: number
+  fecha: string
+  motivo: string
+  estado: string
+  organismo?: string
+  cargoServidor?: string
+  tipoFalta?: string
+  areaProyecto?: string
+  calidadDenunciante?: string
+  medidasCautelares?: string
+  resultadoFallo?: string
+  tipoSancion?: string
+  montoSuspension?: number
+}
+
+async function obtenerDatosDesdeApi(): Promise<ApiResponse> {
+  const res = await fetch("/api/denuncias");
+
+  if (!res.ok) {
+    const text = await res.text();
+    console.error("Error al llamar /api/denuncias:", res.status, text);
+    throw new Error("No se pudieron cargar los datos de la API");
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <AdminNavbar />
-      <div className="flex">
-        <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
-        <main className="flex-1 p-8">
-          {activeSection === "dashboard" && (
-            <div>
-              <h1 className="text-3xl font-bold mb-8 text-foreground">Panel de Control Administrativo</h1>
+  return (await res.json()) as ApiResponse;
+}
 
-              {/* Summary Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                {[
-                  { label: "Total Casos", value: complaints.length, icon: "📋" },
-                  {
-                    label: "En Análisis",
-                    value: complaints.filter((c) => c.status === "En análisis").length,
-                    icon: "⏳",
-                  },
-                  { label: "Resueltas", value: complaints.filter((c) => c.status === "Resuelta").length, icon: "✅" },
-                  {
-                    label: "Canalizadas",
-                    value: complaints.filter((c) => c.status === "Canalizada").length,
-                    icon: "➡️",
-                  },
-                ].map((stat, i) => (
-                  <Card key={i} className="p-4">
-                    <p className="text-2xl mb-2">{stat.icon}</p>
-                    <p className="text-secondary text-sm">{stat.label}</p>
-                    <p className="text-2xl font-bold text-primary">{stat.value}</p>
-                  </Card>
-                ))}
+
+function getStatusBadgeClasses(status: string) {
+  const normalized = status.toLowerCase()
+  if (normalized.includes("curso") || normalized.includes("análisis") || normalized.includes("revision")) {
+    return "bg-amber-100 text-amber-900"
+  }
+  if (normalized.includes("cerrada") || normalized.includes("resuelta")) {
+    return "bg-green-100 text-green-900"
+  }
+  return "bg-blue-100 text-blue-900"
+}
+
+export default function AdminPage() {
+  const [activeSection, setActiveSection] = useState("dashboard")
+  const [apiData, setApiData] = useState<ApiResponse | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const data = await obtenerDatosDesdeApi()
+        setApiData(data)
+      } catch (err) {
+        console.error(err)
+        setError("No se pudieron cargar los datos de la API. Se mostrará información limitada.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  const denuncias: DenunciaEnriquecida[] = useMemo(() => {
+    if (!apiData || !apiData.h25_denuncias_bas) return []
+
+    const sp = apiData.h25_sp || []
+    const calidades = apiData.h25_denunc_anon || []
+    const faltas = apiData.h25_falta_clasif || []
+    const procesos = apiData.h25_proc_inv || []
+    const resoluciones = apiData.h25_res_sanc || []
+
+    return apiData.h25_denuncias_bas.map((denuncia) => {
+      const id = denuncia.folio_id
+      const servidor = sp.find((s) => s.denuncia_id === id)
+      const calidad = calidades.find((c) => c.denuncia_id === id)
+      const falta = faltas.find((f) => f.denuncia_id === id)
+      const proceso = procesos.find((p) => p.denuncia_id === id)
+      const resolucion = resoluciones.find((r) => r.denuncia_id === id)
+
+      return {
+        id,
+        fecha: denuncia.fecha_emision,
+        motivo: denuncia.razon_justificacion,
+        estado: denuncia.estado_denuncia,
+        organismo: servidor?.organismo_alcaldia,
+        cargoServidor: servidor?.cargo_grado_servidor,
+        tipoFalta: falta?.tipo_falta || servidor?.tipo_de_falta,
+        areaProyecto: falta?.area_proyecto_vinculado,
+        calidadDenunciante: calidad?.calidad_denunciante,
+        medidasCautelares: proceso?.medidas_cautelares,
+        resultadoFallo: resolucion?.resultado_fallo,
+        tipoSancion: resolucion?.tipo_sancion_impuesta,
+        montoSuspension: resolucion?.monto_suspension,
+      }
+    })
+  }, [apiData])
+
+  const stats = useMemo(() => {
+    const total = denuncias.length
+    const enAnalisis = denuncias.filter((d) =>
+      d.estado.toLowerCase().includes("curso") || d.estado.toLowerCase().includes("revision"),
+    ).length
+    const cerradas = denuncias.filter((d) => d.estado.toLowerCase().includes("cerrada")).length
+    const conSancion = denuncias.filter(
+      (d) =>
+        (d.tipoSancion && d.tipoSancion.toLowerCase() !== "ninguna") ||
+        (typeof d.montoSuspension === "number" && d.montoSuspension > 0),
+    ).length
+
+    return { total, enAnalisis, cerradas, conSancion }
+  }, [denuncias])
+
+  const resumen = useMemo(() => {
+    // Ordenar por fecha (más recientes primero) y tomar los primeros 4
+    return [...denuncias].sort((a, b) => (a.fecha < b.fecha ? 1 : -1)).slice(0, 4)
+  }, [denuncias])
+
+  return (
+    <div className="min-h-screen bg-light flex flex-col">
+      <AdminNavbar />
+      <div className="flex flex-1">
+        <AdminSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
+
+        <main className="flex-1 p-6 md:p-8 bg-light">
+          {activeSection === "dashboard" && (
+            <div className="space-y-8">
+              <div>
+                <h1 className="text-3xl font-bold mb-2 text-foreground">Panel información general</h1>
+                <p className="text-secondary text-sm md:text-base">
+                  Resumen en tiempo real de las denuncias y procedimientos de datos abiertos.
+                </p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Recent Cases */}
-                <div className="lg:col-span-2">
-                  <Card className="p-6">
-                    <h2 className="text-xl font-semibold mb-4 text-foreground">Casos Recientes (Demo)</h2>
-                    <div className="space-y-3">
-                      {complaints.slice(0, 3).map((complaint) => (
-                        <div key={complaint.id} className="border border-border rounded p-4 hover:bg-light transition">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <p className="font-semibold text-foreground">{complaint.folio}</p>
-                              <p className="text-sm text-secondary">
-                                {complaint.type === "corrupción"
-                                  ? "Corrupción"
-                                  : complaint.type === "mal_servicio"
-                                    ? "Mal servicio"
-                                    : "Información"}
-                              </p>
-                            </div>
-                            <span className="px-3 py-1 rounded text-sm font-medium bg-blue-100 text-primary">
-                              {complaint.status}
-                            </span>
-                          </div>
-                          <p className="text-sm text-secondary mb-3">{complaint.institution}</p>
-                          <button
-                            onClick={() => setSelectedComplaint(complaint)}
-                            className="text-sm text-primary hover:underline"
-                          >
-                            Ver detalles →
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-                </div>
+              {loading && <p className="text-sm text-secondary">Cargando datos de la API...</p>}
+              {error && !loading && <p className="text-sm text-red-600">{error}</p>}
 
-                {/* Quick Actions / Complaint Details */}
-                <div>
-                  <Card className="p-6">
-                    <h2 className="text-xl font-semibold mb-4 text-foreground">
-                      {selectedComplaint ? "Detalles del Caso" : "Acciones Rápidas"}
-                    </h2>
-                    {selectedComplaint ? (
-                      <div className="space-y-4">
-                        <div>
-                          <p className="text-xs text-secondary">FOLIO</p>
-                          <p className="font-semibold text-foreground">{selectedComplaint.folio}</p>
+              {!loading && (
+                <>
+                  {/* Tarjetas de resumen */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <Card className="p-5 flex flex-col gap-2">
+                      <span className="text-2xl">📄</span>
+                      <p className="text-sm text-secondary">Total de casos</p>
+                      <p className="text-2xl font-bold text-primary">{stats.total}</p>
+                    </Card>
+                    <Card className="p-5 flex flex-col gap-2">
+                      <span className="text-2xl">⏳</span>
+                      <p className="text-sm text-secondary">En análisis / revisión</p>
+                      <p className="text-2xl font-bold text-primary">{stats.enAnalisis}</p>
+                    </Card>
+                    <Card className="p-5 flex flex-col gap-2">
+                      <span className="text-2xl">✅</span>
+                      <p className="text-sm text-secondary">Casos cerrados</p>
+                      <p className="text-2xl font-bold text-primary">{stats.cerradas}</p>
+                    </Card>
+                    <Card className="p-5 flex flex-col gap-2">
+                      <span className="text-2xl">➡️</span>
+                      <p className="text-sm text-secondary">Con sanción o medidas</p>
+                      <p className="text-2xl font-bold text-primary">{stats.conSancion}</p>
+                    </Card>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Resumen de casos (antes: Casos Recientes (Demo)) */}
+                    <div className="lg:col-span-2">
+                      <Card className="p-6">
+                        <h2 className="text-xl font-semibold mb-4 text-foreground">Resumen</h2>
+                        {denuncias.length === 0 && (
+                          <p className="text-sm text-secondary">
+                            No se encontraron denuncias en los datos de la API.
+                          </p>
+                        )}
+                        <div className="space-y-3">
+                          {resumen.map((d) => (
+                            <div
+                              key={d.id}
+                              className="border border-border rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3"
+                            >
+                              <div>
+                                <p className="text-sm font-semibold text-foreground">
+                                  FOL-{d.id.toString().padStart(5, "0")}
+                                </p>
+                                <p className="text-xs text-secondary mb-1">
+                                  {d.tipoFalta || "Tipo de falta no especificado"} ·{" "}
+                                  {d.organismo || "Organismo no especificado"}
+                                </p>
+                                <p className="text-xs text-secondary line-clamp-2">{d.motivo}</p>
+                              </div>
+                              <div className="flex flex-col items-end gap-2">
+                                <span
+                                  className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusBadgeClasses(
+                                    d.estado,
+                                  )}`}
+                                >
+                                  {d.estado}
+                                </span>
+                                {d.resultadoFallo && (
+                                  <span className="text-[11px] text-secondary">
+                                    Resolución: {d.resultadoFallo}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                        <div>
-                          <p className="text-xs text-secondary">ESTADO ACTUAL</p>
-                          <p className="font-semibold text-foreground mb-2">{selectedComplaint.status}</p>
-                          <div className="space-y-2">
-                            {["En análisis", "Canalizada", "Resuelta"].map((status) => (
-                              <Button
-                                key={status}
-                                onClick={() => {
-                                  updateComplaintStatus(selectedComplaint.id, status)
-                                  setSelectedComplaint({ ...selectedComplaint, status })
-                                }}
-                                variant={selectedComplaint.status === status ? "default" : "outline"}
-                                className="w-full text-sm"
-                              >
-                                {status}
-                              </Button>
-                            ))}
-                          </div>
+                      </Card>
+                    </div>
+
+                    {/* Acciones rápidas: sin botón de Configuración */}
+                    <div>
+                      <Card className="p-6">
+                        <h2 className="text-xl font-semibold mb-4 text-foreground">Acciones Rápidas</h2>
+                        <div className="space-y-3">
+                          <Button className="w-full">
+                            📊 Generar reporte
+                          </Button>
+                          <Button variant="outline" className="w-full bg-transparent">
+                            📤 Exportar datos
+                          </Button>
                         </div>
-                        <Button onClick={() => setSelectedComplaint(null)} variant="outline" className="w-full">
-                          Cerrar
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        <Button className="w-full bg-primary hover:bg-primary-dark">📊 Generar Reporte</Button>
-                        <Button variant="outline" className="w-full bg-transparent">
-                          📤 Exportar Datos
-                        </Button>
-                        <Button variant="outline" className="w-full bg-transparent">
-                          ⚙️ Configuración
-                        </Button>
-                        <div className="pt-4 border-t border-border">
-                          <p className="text-xs text-secondary mb-2">Esto es un DEMO</p>
+                        <div className="pt-4 border-t border-border mt-4">
+                          <p className="text-xs text-secondary mb-1">
+                            Los datos mostrados se obtienen directamente de la API oficial.
+                          </p>
                           <p className="text-xs text-secondary">
-                            Puedes cambiar estados de los casos para probar el sistema
+                            Este panel es un resumen visual; el detalle completo puede verse en otros módulos.
                           </p>
                         </div>
-                      </div>
-                    )}
-                  </Card>
-                </div>
-              </div>
+                      </Card>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           )}
           {activeSection === "petitions" && <Petitions />}

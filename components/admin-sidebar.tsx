@@ -8,7 +8,7 @@ interface AdminSidebarProps {
 export default function AdminSidebar({ activeSection, onSectionChange }: AdminSidebarProps) {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'petitions', label: 'Peticiones', icon: '📋' },
+    { id: 'petitions', label: 'Mis denuncias', icon: '📋' },
     { id: 'metrics', label: 'Métricas', icon: '📈' },
   ];
 
