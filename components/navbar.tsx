@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -9,10 +10,6 @@ const navLinks = [
   {
     href: "/orientador",
     label: "¿Dónde Denuncio?",
-  },
-  {
-    href: "/denuncias",
-    label: "Rastrear",
   },
   {
     href: "/guia",
@@ -67,14 +64,25 @@ export default function Navbar() {
   return (
     <header className="w-full bg-white border-b">
       <nav className="container mx-auto flex items-center justify-between py-4 px-4 md:px-6">
-        {/* Logo / Marca (esto también sirve como "volver al inicio" sin cerrar sesión) */}
-        <Link href="/" className="flex flex-col leading-tight">
-          <span className="text-xl font-extrabold tracking-tight text-primary">
-            DATA FOR ALL
-          </span>
-          <span className="text-xs text-muted-foreground">
-            Datos abiertos. Puertas abiertas.
-          </span>
+
+        {/* Logo  */}
+        <Link href="/" className="flex items-center gap-3">
+          <Image
+            src="/logo.png"
+            alt="Logo"
+            width={90}
+            height={90}
+            className="object-contain"
+          />
+
+          <div className="flex flex-col leading-tight">
+            <span className="text-xl font-extrabold tracking-tight text-primary">
+              DATA FOR ALL
+            </span>
+            <span className="text-xs text-muted-foreground">
+              Datos abiertos. Puertas abiertas.
+            </span>
+          </div>
         </Link>
 
         {/* Links del menú */}
@@ -97,7 +105,6 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           {isLoggedIn ? (
             <>
-              {/* Ir al panel admin */}
               <Link
                 href="/admin"
                 className="px-4 py-2 rounded-full bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition"
@@ -105,7 +112,6 @@ export default function Navbar() {
                 Ir al panel
               </Link>
 
-              {/* Cerrar sesión */}
               <button
                 type="button"
                 onClick={handleLogout}

@@ -9,13 +9,19 @@ export default function Hero() {
   };
 
   return (
-    <section id="home" className="bg-gradient-to-r from-primary to-primary-dark text-white py-20">
+    <section
+      id="home"
+      className="text-white py-20"
+      style={{
+        background: 'linear-gradient(90deg, #7a001c 0%, #a44a62ff 50%, #ebbec3ff 100%)',
+      }}
+    >
       <div className="container mx-auto px-5 text-center">
         <h2 className="text-5xl font-bold mb-4">Seguimiento Transparente de Peticiones Ciudadanas</h2>
         <p className="text-xl mb-8 opacity-90">Consulta el estado de tus peticiones, quejas y trámites en tiempo real</p>
         <button
           onClick={handleScroll}
-          className="bg-white text-primary px-8 py-3 rounded font-semibold hover:shadow-lg transition"
+          className="bg-white text-[#7a001c] px-8 py-3 rounded font-semibold hover:shadow-lg transition"
         >
           Rastrear mi Petición
         </button>

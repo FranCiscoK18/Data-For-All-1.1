@@ -223,7 +223,7 @@ export const programasSociales: ProgramaSocial[] = [
     zona_region_que_aplica: "Todo el Estado",
     estado_actual_programa: "Vigente",
     categoria_programa: "Salud",
-    link_externo: "https://salud.qroo.gob.mx/atencion-medica-gratuita"
+    link_externo: "https://www.gob.mx/insabi"
   },
   {
     id: 3,

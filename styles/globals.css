@@ -123,3 +123,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+:root {
+  --hero-start: oklch(0.40 0.28 20);
+  --hero-mid:   oklch(0.72 0.18 20);
+  --hero-end:   oklch(0.97 0.04 20);
+}
+@layer utilities {
+  .hero-gradient {
+    background: linear-gradient(
+      to right,
+      var(--hero-start),
+      var(--hero-mid),
+      var(--hero-end)
+    );
+  }
+}
