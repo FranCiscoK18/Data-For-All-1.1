@@ -49,15 +49,26 @@ type ApiResolucion = {
 };
 
 type ApiResponse = {
-  // por compatibilidad con tus mocks anteriores
+  // Estructura de la API real
+  source?: 'api' | 'mock';
+  nombreEquipo?: string;
+  datosTablas?: {
+    h25_denuncias_bas?: ApiDenunciaBasica[];
+    h25_datos_sp?: ApiServidorPublico[];
+    h25_sp?: ApiServidorPublico[];
+    h25_denunc_anon?: ApiDenunciante[];
+    h25_falta_clasif?: ApiFaltaClasif[];
+    h25_proc_inv?: ApiProcInv[];
+    h25_res_sanc?: ApiResolucion[];
+  };
+  // Formato plano (mocks)
   h25_denuncias_bas?: ApiDenunciaBasica[];
   h25_datos_sp?: ApiServidorPublico[];
+  h25_sp?: ApiServidorPublico[];
   h25_denunc_anon?: ApiDenunciante[];
   h25_falta_clasif?: ApiFaltaClasif[];
   h25_proc_inv?: ApiProcInv[];
   h25_res_sanc?: ApiResolucion[];
-  // y la estructura tal cual de la API real
-  h25_sp?: ApiServidorPublico[];
 };
 
 export default function TrackingSection() {
@@ -65,10 +76,9 @@ export default function TrackingSection() {
   const [petition, setPetition] = useState<any | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  // para mostrar si vino de API real o mock
   const [dataSource, setDataSource] = useState<'api' | 'mock' | null>(null);
 
-  // 🔹 guarda los folios que sí encontraron coincidencia
+  // Guarda últimos folios consultados en este navegador
   const saveFolioLocally = (folioNumber: number) => {
     if (typeof window === 'undefined') return;
     try {
@@ -83,7 +93,7 @@ export default function TrackingSection() {
         }
       }
 
-      // metemos al inicio y evitamos duplicados, máximo 5
+      // últimos 5, sin duplicados
       const updated = [folioNumber, ...current.filter((v) => v !== folioNumber)].slice(0, 5);
       window.localStorage.setItem(storageKey, JSON.stringify(updated));
     } catch (err) {
@@ -124,18 +134,22 @@ export default function TrackingSection() {
 
       const raw: ApiResponse = await res.json();
 
-      // si tu endpoint marca si vino de API real o mock, puedes usar algo tipo:
-      const source = (raw as any).source === 'api' ? 'api' : 'mock';
+      const source = raw.source === 'api' ? 'api' : 'mock';
       setDataSource(source);
 
-      const basicosList = raw.h25_denuncias_bas ?? [];
-      const spList = raw.h25_sp ?? raw.h25_datos_sp ?? [];
-      const denuncianteList = raw.h25_denunc_anon ?? [];
-      const faltasList = raw.h25_falta_clasif ?? [];
-      const procesosList = raw.h25_proc_inv ?? [];
-      const resolucionesList = raw.h25_res_sanc ?? [];
+      // 👉 AQUÍ estaba el problema:
+      // cuando viene de la API real, las tablas están en raw.datosTablas
+      const tablas: any = (raw as any).datosTablas ?? raw;
 
-      // Buscar base por folio_id
+      const basicosList: ApiDenunciaBasica[] = tablas.h25_denuncias_bas ?? [];
+      const spList: ApiServidorPublico[] =
+        tablas.h25_sp ?? tablas.h25_datos_sp ?? [];
+      const denuncianteList: ApiDenunciante[] = tablas.h25_denunc_anon ?? [];
+      const faltaList: ApiFaltaClasif[] = tablas.h25_falta_clasif ?? [];
+      const procList: ApiProcInv[] = tablas.h25_proc_inv ?? [];
+      const resolList: ApiResolucion[] = tablas.h25_res_sanc ?? [];
+
+      // Buscar la denuncia por folio
       const basicos = basicosList.find((d) => d.folio_id === folioNumber);
 
       if (!basicos) {
@@ -147,38 +161,52 @@ export default function TrackingSection() {
 
       const denunciaId = basicos.folio_id;
 
-      const servidorPublico = spList.find((s) => s.denuncia_id === denunciaId);
-      const denunciante = denuncianteList.find((d) => d.denuncia_id === denunciaId);
-      const falta = faltasList.find((f) => f.denuncia_id === denunciaId);
-      const procInv = procesosList.find((p) => p.denuncia_id === denunciaId);
-      const resol = resolucionesList.find((r) => r.denuncia_id === denunciaId);
+      const servidorPublico = spList.find(
+        (s) => s.denuncia_id === denunciaId
+      );
+      const denunciante = denuncianteList.find(
+        (d) => d.denuncia_id === denunciaId
+      );
+      const falta = faltaList.find((f) => f.denuncia_id === denunciaId);
+      const procInv = procList.find((p) => p.denuncia_id === denunciaId);
+      const resol = resolList.find((r) => r.denuncia_id === denunciaId);
 
+      const esAnonimo =
+        (denunciante?.calidad_denunciante || '').toLowerCase().includes('anon');
+
+      // Objeto que espera <PetitionResult />
       const petitionFromApi = {
-        folio: denunciaId,
-        datosGenerales: {
-          fechaEmision: new Date(basicos.fecha_emision).toLocaleDateString('es-MX'),
+        folio: String(basicos.folio_id),
+        basicos: {
+          fechaEmision: new Date(basicos.fecha_emision).toLocaleDateString(
+            'es-MX',
+            { day: '2-digit', month: '2-digit', year: 'numeric' }
+          ),
           motivo: basicos.razon_justificacion,
           estadoActual: basicos.estado_denuncia,
         },
         servidorPublico: {
-          alcaldiaOrganismo: servidorPublico?.organismo_alcaldia ?? 'No disponible',
+          alcaldiaOrganismo:
+            servidorPublico?.organismo_alcaldia ?? 'No disponible',
           cargo: servidorPublico?.cargo_grado_servidor ?? 'No disponible',
           tipoFalta:
             falta?.tipo_falta ??
             servidorPublico?.tipo_de_falta ??
             'No disponible',
-          unidadInvestigadora: servidorPublico?.unidad_investigadora ?? 'No disponible',
+          unidadInvestigadora:
+            servidorPublico?.unidad_investigadora ?? 'No disponible',
           idDenuncia: String(denunciaId),
         },
         denunciante: {
           calidad: denunciante?.calidad_denunciante ?? 'No especificado',
+          esAnonimo,
         },
-        falta: {
-          tipo:
+        clasificacion: {
+          tipoFalta:
             falta?.tipo_falta ??
             servidorPublico?.tipo_de_falta ??
             'No especificado',
-          area:
+          areaProyecto:
             falta?.area_proyecto_vinculado ??
             servidorPublico?.organismo_alcaldia ??
             'Dependencia no especificada',
@@ -190,9 +218,13 @@ export default function TrackingSection() {
           medidasCautelares: procInv?.medidas_cautelares ?? 'No registradas',
           relacionConDenuncia: `Asociada al folio ${denunciaId}`,
           estadoInvestigacion:
-            resol?.resultado_fallo ?? basicos.estado_denuncia ?? 'En trámite',
+            resol?.resultado_fallo ??
+            basicos.estado_denuncia ??
+            'En trámite',
           ultimaActualizacion: resol?.fecha_resolucion_final
-            ? new Date(resol.fecha_resolucion_final).toLocaleDateString('es-MX')
+            ? new Date(resol.fecha_resolucion_final).toLocaleDateString(
+                'es-MX'
+              )
             : new Date(basicos.fecha_emision).toLocaleDateString('es-MX'),
           avancePorcentaje: 'ND',
         },
@@ -220,7 +252,6 @@ export default function TrackingSection() {
       };
 
       setPetition(petitionFromApi);
-      // 👇 aquí guardamos el folio para que después lo lea el panel
       saveFolioLocally(denunciaId);
     } catch (err) {
       console.error(err);
@@ -275,25 +306,24 @@ export default function TrackingSection() {
             </button>
           </form>
 
-          {/* Mensaje de origen de los datos */}
           {dataSource && (
             <p className="mt-3 text-xs text-[#6B7280]">
-              Mostrando información proveniente de:{" "}
+              Mostrando información proveniente de:{' '}
               <span className="font-semibold">
-                {dataSource === 'api' ? 'API oficial de datos abiertos' : 'datos de demostración'}
+                {dataSource === 'api'
+                  ? 'API oficial de datos abiertos'
+                  : 'datos de demostración (mock)'}
               </span>
               .
             </p>
           )}
 
-          {/* Mensajes de error */}
           {error && (
             <div className="mt-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded text-sm">
               {error}
             </div>
           )}
 
-          {/* Resultado */}
           {petition && !error && <PetitionResult petition={petition} />}
         </div>
       </div>
