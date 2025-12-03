@@ -308,11 +308,11 @@ export default function TrackingSection() {
 
           {dataSource && (
             <p className="mt-3 text-xs text-[#6B7280]">
-              Mostrando información proveniente de:{' '}
+             
               <span className="font-semibold">
                 {dataSource === 'api'
-                  ? 'API oficial de datos abiertos'
-                  : 'datos de demostración (mock)'}
+                  ? ''
+                  : ''}
               </span>
               .
             </p>

@@ -7,14 +7,14 @@ const MOCK_DATA = {
       id_sp: 1,
       denuncia_id: 10001,
       organismo_alcaldia: "Alcaldia Cuauhtemoc",
-      cargo_grado_servidor: "Director de Area",
+      cargo_grado_servidor: "Director de Área",
       tipo_de_falta: "Administrativa",
       unidad_investigadora: "Auditoria Interna",
     },
     {
       id_sp: 2,
       denuncia_id: 10002,
-      organismo_alcaldia: "Secretaria de Movilidad",
+      organismo_alcaldia: "Secretaría de Movilidad",
       cargo_grado_servidor: "Jefe de Departamento",
       tipo_de_falta: "Etica",
       unidad_investigadora: "Contraloria General",
@@ -38,7 +38,7 @@ const MOCK_DATA = {
     {
       id_sp: 5,
       denuncia_id: 10005,
-      organismo_alcaldia: "Secretaria de Obras",
+      organismo_alcaldia: "Secretaría de Obras",
       cargo_grado_servidor: "Inspector Técnico",
       tipo_de_falta: "Corrupción",
       unidad_investigadora: "Contraloria General",
@@ -54,7 +54,7 @@ const MOCK_DATA = {
     {
       id_sp: 7,
       denuncia_id: 10007,
-      organismo_alcaldia: "Secretaria de Salud",
+      organismo_alcaldia: "Secretaría de Salud",
       cargo_grado_servidor: "Medico Especialista",
       tipo_de_falta: "Etica",
       unidad_investigadora: "Auditoria Interna",
@@ -70,7 +70,7 @@ const MOCK_DATA = {
     {
       id_sp: 9,
       denuncia_id: 10009,
-      organismo_alcaldia: "Secretaria de Finanzas",
+      organismo_alcaldia: "Secretaría de Finanzas",
       cargo_grado_servidor: "Analista de Presupuesto",
       tipo_de_falta: "Corrupción",
       unidad_investigadora: "Unidad de Responsabilidades",
@@ -100,7 +100,7 @@ const MOCK_DATA = {
     {
       folio_id: 10001,
       fecha_emision: "2025-01-15",
-      razon_justificacion: "Mala atencion en ventanilla de servicios",
+      razon_justificacion: "Mala atención en ventanilla de servicios",
       estado_denuncia: "Cerrada",
     },
     {
@@ -169,7 +169,7 @@ const MOCK_DATA = {
       id_falta: 2,
       denuncia_id: 10002,
       tipo_falta: "Etica",
-      area_proyecto_vinculado: "Atencion Ciudadana",
+      area_proyecto_vinculado: "Atención Ciudadana",
     },
     {
       id_falta: 3,

@@ -32,7 +32,7 @@ const servidoresPublicos: ServidorPublicoImplicado[] = [
   {
     id_sp: 3,
     denuncia_id: 10003,
-    organismo_alcaldia: "Secretaria de Salud QR",
+    organismo_alcaldia: "Secretaría de Salud QR",
     cargo_grado_servidor: "Jefe de Departamento",
     tipo_de_falta: "Penal",
     unidad_investigadora: "Fiscalia Anticorrupcion",
@@ -40,7 +40,7 @@ const servidoresPublicos: ServidorPublicoImplicado[] = [
   {
     id_sp: 4,
     denuncia_id: 10004,
-    organismo_alcaldia: "Secretaria de Educacion",
+    organismo_alcaldia: "Secretaría de Educación",
     cargo_grado_servidor: "Coordinador Regional",
     tipo_de_falta: "Administrativa",
     unidad_investigadora: "Organo Interno de Control",
@@ -118,7 +118,7 @@ const faltasClasificacion: FaltaClasificacion[] = [
   {
     denuncia_id: 10004,
     tipo_falta: "Etica",
-    area_proyecto_vinculado: "Educacion",
+    area_proyecto_vinculado: "Educación",
   },
   {
     denuncia_id: 10005,
@@ -201,8 +201,8 @@ export const programasSociales: ProgramaSocial[] = [
     id: 1,
     programas: "Programa Social",
     nombre_programa: "Mujer es Poder",
-    institucion_encargada: "Secretaria de Bienestar",
-    tipo_apoyo: "Economico",
+    institucion_encargada: "Secretaría de Bienestar",
+    tipo_apoyo: "Económico",
     costo_servicio: "Sin costo",
     pasos_a_seguir: "Esperar convocatoria, registrarse en linea, presentar documentos",
     requisitos: "Residir en Q. Roo, ser mujer mayor de 18 años, identificacion oficial",
@@ -214,8 +214,8 @@ export const programasSociales: ProgramaSocial[] = [
   {
     id: 2,
     programas: "Servicio Publico",
-    nombre_programa: "Atencion Medica Gratuita",
-    institucion_encargada: "Secretaria de Salud",
+    nombre_programa: "Atención Medica Gratuita",
+    institucion_encargada: "Secretaría de Salud",
     tipo_apoyo: "Servicio de salud",
     costo_servicio: "Sin costo",
     pasos_a_seguir: "Acudir a centro de salud con documentos, registro, consulta",
@@ -229,14 +229,14 @@ export const programasSociales: ProgramaSocial[] = [
     id: 3,
     programas: "Programa Social",
     nombre_programa: "Becas para el Bienestar",
-    institucion_encargada: "Secretaria de Educacion",
-    tipo_apoyo: "Economico educativo",
+    institucion_encargada: "Secretaría de Educación",
+    tipo_apoyo: "Económico educativo",
     costo_servicio: "Sin costo",
     pasos_a_seguir: "Inscripcion escolar, registro en plataforma, validacion",
     requisitos: "Estudiante de nivel basico o medio superior, buen promedio",
     zona_region_que_aplica: "Todo el Estado",
     estado_actual_programa: "Vigente",
-    categoria_programa: "Educacion",
+    categoria_programa: "Educación",
     link_externo: "https://www.gob.mx/becasbenitojuarez"
   },
   {

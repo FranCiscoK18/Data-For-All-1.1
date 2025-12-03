@@ -71,7 +71,7 @@ export default function PetitionResult({ petition }: PetitionResultProps) {
         {/* Información del servidor público denunciado */}
         <div className="p-4 rounded-xl border bg-muted/40">
           <h4 className="text-sm font-semibold text-secondary mb-2">
-            Servidor público denunciado (h25_datos_sp)
+            Servidor público denunciado
           </h4>
           <div className="space-y-1 text-sm">
             <DetailItem
@@ -96,7 +96,7 @@ export default function PetitionResult({ petition }: PetitionResultProps) {
         {/* Calidad del denunciante */}
         <div className="p-4 rounded-xl border bg-muted/40">
           <h4 className="text-sm font-semibold text-secondary mb-2">
-            Calidad del denunciante (h25_denunc_anon)
+            Calidad del denunciante
           </h4>
           <div className="space-y-1 text-sm">
             <DetailItem
@@ -120,7 +120,7 @@ export default function PetitionResult({ petition }: PetitionResultProps) {
         {/* Proceso de investigación */}
         <div className="p-4 rounded-xl border bg-muted/40">
           <h4 className="text-sm font-semibold text-secondary mb-2">
-            Proceso de investigación (h25_proc_inv)
+            Proceso de investigación
           </h4>
           <div className="space-y-1 text-sm">
             <DetailItem
